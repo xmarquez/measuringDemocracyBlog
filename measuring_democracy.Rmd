@@ -222,7 +222,7 @@ by_country %>%
   labs(x = expression(rho), y = "",
   	title = "Distribution of pairwise correlation coefficients between measures, \nby country",
   	subtitle = "Red line represents the average correlation coefficient among measures within given countries, 
-weighted by the degree of overlap between measures. Only measures with an overlap of at least 
+weighted by their degree of overlap within the country. Only measures with an overlap of at least 
 20 years are included.") +
   geom_vline(xintercept = round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2),
              color = "red") +
