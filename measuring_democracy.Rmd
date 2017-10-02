@@ -222,8 +222,8 @@ by_country %>%
   labs(x = expression(rho), y = "",
   	title = "Distribution of pairwise correlation coefficients between measures, \nby country",
   	subtitle = "Red line represents the average correlation coefficient among measures within given countries, 
-weighted by the degree of overlap between measures. Only measures with an overlap of at least 20 years 
-are included.") +
+weighted by the degree of overlap between measures. Only measures with an overlap of at least 
+20 years are included.") +
   geom_vline(xintercept = round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2),
              color = "red") +
   scale_x_continuous(breaks = c(-1,-0.5, 0, 0.5, 1, round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2)))
@@ -266,8 +266,8 @@ by_country %>%
   geom_density(fill = "grey", alpha = 0.2) +
   labs(x = expression(rho), y = "",
   	title = "Distribution of pairwise correlation coefficients between measures, \nby country",
-  	subtitle = "Red line represents the average pairwise correlation between measures, weighted by their degree of overlap.
-Only Freedom House, Polity, PACL, and V-dem measures are included in this calculation.") +
+  	subtitle = "Red line represents the average pairwise correlation between measures, weighted by their degree of 
+overlap. Only Freedom House, Polity, PACL, and V-dem measures are included in this calculation.") +
   geom_vline(xintercept = round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2),
              color = "red") +
   scale_x_continuous(breaks = c(-1,-0.5, 0, 0.5, 1, round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2)))
