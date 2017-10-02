@@ -1,0 +1,436 @@
+---
+title: "The quantification of power: some thoughts on, and tools for, measuring democracy"
+author: "Xavier Marquez"
+date: "26 September 2017"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      cache = TRUE,
+                      cache.rebuild = FALSE,
+                      warning = FALSE,
+                      message = FALSE)
+
+library(tidyverse)
+library(democracyData)
+library(vdem)
+library(QuickUDS)
+
+theme_set(theme_bw())
+```
+
+(More substantive content soon! This is mostly of interest to political scientists, `R` users, and people concerned with the measurement of democracy).
+
+Democracy is the government of numbers. No other form of government has historically been as concerned with the quantification of power. Indeed, the idea that power depends on the *exact* numerical strength of one's supporters, rather than their qualities, would have seemed absurd for most of human history. And I would guess no other form of government has evoked so much mathematical effort. (Even the recent election here in NZ produced [extraordinarily sophisticated Bayesian models to predict the outcome](http://ellisp.github.io/elections/combined.html)). 
+
+And yet because the concept of democracy uneasily mingles what is, what can be, and what ought to be, people often object to the attempt to quantify its degree (or even its existence) in particular places and times. (My students often do!). Democracy does not seem like the kind of thing that would be easily and uncontroversially measurable. On the contrary, because [any attempt to measure democracy reflects certain normative standards](https://www.researchgate.net/profile/David_Altman2/publication/232026394_Conceptualizing_and_Measuring_Democracy_A_New_Approach/links/0046351dc942b01fdb000000/Conceptualizing-and-Measuring-Democracy-A-New-Approach.pdf), it cannot but be controversial, especially since most of its conceptualizations for such purposes tend to reduce it to competitive elections with a wide suffrage, which for a variety of reasons seems like an unacceptably narrow view of the ideal to many people.
+
+This is most obvious when we're talking about cases like Venezuela, where to take a position on the question -- to say "Venezuela is a democracy" or "Venezuela is not a democracy" -- is [to take sides in a rancorous political dispute](http://www.annualreviews.org/doi/pdf/10.1146/annurev-polisci-072314-113326). But even to say something relatively uncontroversial, like "the United States is a consolidated democracy", is fraught with normative implications, since clearly "actually existing democracies" (representative governments with non-Potemkin opposition parties and nearly universal suffrage) are highly imperfect, and to give them top scores in some scale seems to imply that they are better than they truly are. In any case, although most people around the world [accept democracy as the only legitimate form of government](http://abandonedfootnotes.blogspot.com/2015/06/what-do-people-think-of-democracy.html), they disagree enormously about whether or not a given place is or is not actually democratic, and the degree to which particular practices and institutions "matter" for democracy.
+
+Democracy measurement, then, is a somewhat dubious enterprise. The [essential contestability](https://www.jstor.org/stable/4544562) of the concept (is democracy about equality, or about self-government, or about freedom? In what proportions?), as well as good-faith differences of opinion about the sorts of preconditions that are essential for its functioning and the kinds of institutions that actualize its values, make it difficult to take seriously any single measurement of "democraticness." And these disagreements are not really resolvable by appeal to the dictionary; they go back [to the earliest discussions of democracy as a distinct phenomenon](https://www.bloomsbury.com/uk/democratic-moments-9781350006164/) in history.[^1] 
+
+[^1]: On the other hand, unlike other controversial numerical measures of social phenomena, like university rankings or GDP per capita, governments and other organizations do not spend much time trying to "game" measures of democracy, because few people other than a small number of political scientists care, and little money is at stake. This is probably a good thing, on balance.
+
+Yet I still think the attempt to summarize in some disciplined way particular judgments about "democraticness" over time and in space is useful. A democracy measure seems to me to be a numerical crystalization of a political history: a history at a (literal) glance that can be put to use to say more interesting things about the world. One need not agree with any particular conceptualization of democracy, or take any given measure as a normative standard of what democracy should be, to appreciate the possibility of historical comparison across time and space. And because the concept of democracy is inescapably contested, I think the more the merrier: let a hundred measures of democracy bloom, let a thousand schools of thought contend! 
+
+I am thus pleased to announce three different `R` packages (or rather, two and one update) for accessing and manipulating all the democracy datasets I know about:
+
+1. A package to access the [Varieties of Democracy (V-Dem) dataset](https://xmarquez.github.io/vdem), version 7.1 (the latest update). The V-Dem dataset is the gold standard of democracy measurement today. It provides indexes targeting multiple conceptualizations of democracy, and an extremely wide variety of indicators that you can use to satisfy basically every measurement need that you might have; if you don't like their particular conceptualizations of democracy, you can basically build your own. Each country is coded by at least five people, all of whom are live there, and subject to rigorous aggregation and validation procedures. Plus, it is annually updated, and covers the entire period 1900-2016, so it's pretty comprehensive. If you do any serious empirical research that requires you to use measures of democracy, you should seriously consider using V-Dem as your first choice of measure. This package allows you to access the entire V-Dem dataset (more than 3,000 variables, including external ones) directly from `R`, and to extract combinations of columns easily according to particular criteria (e.g., section of the codebook where they appear, label, etc.). Check it out at https://xmarquez.github.io/vdem, and install it using `devtools::install_github("xmarquez/vdem")`.
+
+2. A [package to download or access most other democracy datasets](https://xmarquez.github.io/democracyData) used in scholarly work from `R`, including [Polity IV](http://www.systemicpeace.org/polityproject.html), [Freedom House](https://freedomhouse.org/report-types/freedom-world), [Geddes, Wright, and Frantz's Autocratic Regimes dataset](http://sites.psu.edu/dictators/), the World Governance Indicators' "[Voice and Accountability](http://info.worldbank.org/governance/wgi/#home)" index, the [PACL/ACLP/DD dataset](https://sites.google.com/site/joseantoniocheibub/datasets/democracy-and-dictatorship-revisited), and many others, including some which are now of merely historical interest. (There are 32 of them in the package). The package automates the process of putting these datasets in standard country-year format, assigning appropriate country codes, and the like, and makes it easy to access some less well-known democracy datasets. (Mostly I created it because I've spent hundreds of hours tediously repeating these operations!). Check it out at https://xmarquez.github.io/democracyData, and install it using `devtools::install_github("xmarquez/democracyData")`.
+
+3. Finally, I've also updated my [package to replicate and extend the Unified Democracy scores](https://xmarquez.github.io/QuickUDS). (I first described this package [on this blog](http://abandonedfootnotes.blogspot.com/2016/03/artisanal-democracy-data-quick-and-easy.html)). This produces a latent variable index from multiple democracy measures, based on methods discussed by [Pemstein, Meserve, and Melton in 2010](http://www.unified-democracy-scores.org/); the most recent update of the package extends these scores up to 2016 and incorporates revisions and updates of a variety of datasets, including Polity IV, Freedom House, and V-Dem It also includes improvements to the functions used to calculate UDS-style models. Check it out at https://xmarquez.github.io/QuickUDS, and install it using `devtools::install_github("xmarquez/QuickUDS")`.
+
+Feedback, contributors, and pull requests for any of these packages welcome; I hope to be able to submit at least 2 of these to [CRAN](https://cran.r-project.org/) in the near future, so if you use them and encounter any problems let me know. (The V-Dem package is too large for CRAN and will probably never be there).
+
+In what follows, a short discussion of the characteristics of these measures, probably of most interest to people who already use them.
+
+## Some general characteristics of democracy measures
+
+The numerical measurement of democracy is about fifty years old. The earliest comprehensive measures of democracy -- the [Polity project](http://www.systemicpeace.org/inscrdata.html), Freedom House's [Freedom in the World](https://freedomhouse.org/report-types/freedom-world) index (first known as the Gastil index), [Kenneth Bollen](https://www.jstor.org/stable/2094588), and [Tatu Vanhanen](https://books.google.co.nz/books?id=ofCGAgAAQBAJ&lpg=PP1&pg=PP1#v=onepage&q&f=false) -- go back to the late 1960s and early 1970s. (Vanhanen, who's been at this business longer than most, [identifies some earlier attempts to measure democracy numerically](https://link.springer.com/chapter/10.1007/978-3-322-89590-5_9), some going back to the early 1950s, but these were pretty small and unsystematic). There are now `r nrow(democracy_info %>% distinct(dataset))` different accesible datasets containing some measure of democracy, most developed in the first decade of this century (at least AFAIK):
+
+```{r}
+
+democracy_info %>%
+  distinct(dataset, first_published_use, measure_type) %>%
+  ggplot(aes(first_published_use)) +
+  geom_bar(aes(fill = measure_type)) +
+  labs(x = "Approximate year of first publication", 
+       y = "Number of datasets measuring democracy",
+       title = "Number of democracy measurement projects, by year",
+       fill = "Measure type")
+
+```
+
+Most of these measures tend to be highly but not perfectly correlated, reflecting differences in conceptualization as well as varying judgments about the political situation of specific countries and periods:
+
+```{r, include = FALSE}
+gdsd <- memoise::memoise(generate_democracy_scores_dataset)
+
+democracy <- gdsd(output_format = "wide", verbose = FALSE)
+
+```
+
+```{r}
+
+vdem_indexes <- extract_vdem_filter(section == 1, !grepl("component index", label),
+                                    include_uncertainty = FALSE) %>% 
+  select(-historical_date:-vdem_cown, -GW_startdate:-lon)
+
+measures <- c("pmm_arat", "blm", "bmr_democracy",
+              "bnr_extended", "pmm_bollen", "doorenspleet",
+              "wgi_democracy","fh_total_reversed", 
+              "fh_electoral", "gwf_democracy_extended", 
+              "pmm_hadenius", "kailitz_binary",
+              "lexical_index", "mainwaring", 
+              "magaloni_democracy_extended",
+              "pmm_munck", "pacl", "PEPS1i", 
+              "PEPS1q", "PEPS1v", "PEPS2i", 
+              "PEPS2q", "PEPS2v", "pitf", 
+              "pitf_binary", "polity", "polity2", "reign_democracy", 
+              "polyarchy_original_contestation", 
+              "polyarchy_original_polyarchy",
+              "polyarchy_inclusion_dimension",
+              "polyarchy_contestation_dimension",
+              "prc", "PIPE_democracy", "svolik_democracy", 
+              "uds_2014_mean", "ulfelder_democracy_extended",
+              "utip_dichotomous_strict", "v2x_polyarchy",
+              "v2x_api", "v2x_delibdem", "v2x_egaldem", 
+              "v2x_libdem", "v2x_mpi", "v2x_partipdem", 
+              "v2x_polyarchy", "vanhanen_democratization", 
+              "vanhanen_competition", "vanhanen_participation", 
+              "wth_democ1", "wth_democrobust", "z1")
+
+democracy_full <- full_join(democracy, vdem_indexes) %>%
+  filter(!is.na(extended_country_name)) %>%
+  left_join(extended_uds) %>%
+  select(extended_country_name, GWn, cown, in_GW_system, year,
+         measures) 
+```
+
+
+```{r}
+identifiers <- democracy_full %>%
+  filter(year >= 1900) %>%
+  mutate(country_year = paste(extended_country_name, year)) %>%
+  pull(country_year)
+
+correlations <- democracy_full %>%
+  filter(year >= 1900) %>%
+  select(measures) %>%
+  as.matrix() %>%
+  Hmisc::rcorr() 
+
+rho <- as.numeric(as.dist(correlations$r))
+rho[ rho == 0] <- NA
+
+n <- as.numeric(as.dist(correlations$n))
+n[ n == 0] <- NA
+
+rho_avg <- weighted.mean(rho, n, na.rm = TRUE)
+
+data_frame(r = rho, 
+           n = n) %>%
+  filter(!is.na(r), r < 1) %>%
+  ggplot(aes(x = r, weight = n)) +
+  geom_density(fill = "lightgrey", alpha = 0.2) +
+  geom_vline(xintercept = round(rho_avg, 2), color = "red") +
+  scale_x_continuous(breaks = c(0.25, 0.5, 0.75,
+                                round(rho_avg, 2), 1)) +
+  labs(y = "", x = expression(rho),
+       title = "Overall distribution of correlation coefficients among all democracy datasets",
+       subtitle = "Red line represents the average of the pairwise correlation coefficients among democracy measures,
+weighted by their degree of overlap.")
+
+```
+
+Yet the high overall level of correlation among these measures masks substantial variation over time:
+
+```{r}
+by_year <- democracy_full %>%
+  group_by(year) %>%
+  gather(measure, value, eval(measures)) %>%
+  group_by(year, measure) %>%
+  filter(!is.na(value), !is.na(GWn), n() > 4) %>%
+  group_by(year) %>%
+  arrange(year, measure) %>%
+  summarise(matrix = list(tibble(id = paste(extended_country_name, GWn, cown, in_GW_system, year), 
+                                 measure = measure, 
+                                 value = value) %>%
+                            spread(measure, value) %>%
+                            select(-id) %>%
+                            as.matrix())) %>%
+  group_by(year) %>%
+  summarise(corr = map(matrix, Hmisc::rcorr) %>%
+              map("r") %>%
+              map(as.dist) %>%
+              map(~ifelse(. == 0, NA, .)) %>%
+              map(Hmisc::smean.cl.normal)) %>%
+  group_by(year) %>%
+  mutate(vars = list(c("mean_r", "pct025", "pct975"))) %>%
+  unnest() %>%
+  spread(vars, corr) %>%
+  filter(!is.na(mean_r))
+
+by_year %>%
+  filter(year > 1800, year < 2017) %>%
+  ggplot(aes(x = year, y = mean_r, ymin = pct025, ymax = pct975)) +
+  geom_line() +
+  geom_ribbon(alpha = 0.2) +
+  labs(y = expression(rho),
+       x = "",
+       title = "Average pairwise correlation between democracy measures, by year")
+
+```
+
+There is a lot more agreement among measures of democracy after the 1920s than before, simply because it is harder to make judgments of democracy for the more distant past (how much should class-stratified male suffrage count? etc.), though go back far enough and it's reasonably easy (since there are no democracies past a certain point). In any case, only 13 of the 32 datasets measuring democracy code countries during the 19th century, and only 8 of these make any effort to be comprehensive (mostly because they follow the Polity IV panel, or modify the polity IV scores in some way).
+
+These correlations among measures also mask substantial variation in space:
+
+```{r}
+by_country <- democracy_full %>%
+  group_by(extended_country_name) %>%
+  gather(measure, value, eval(measures)) %>%
+  group_by(extended_country_name, measure) %>%
+  filter(!is.na(value), !is.na(GWn), n() > 4) %>%
+  group_by(extended_country_name) %>%
+  arrange(extended_country_name, measure) %>%
+  summarise(matrix = list(tibble(id = paste(extended_country_name, GWn, cown, in_GW_system, year), 
+                                 measure = measure, 
+                                 value = value) %>%
+                            spread(measure, value) %>%
+                            select(-id) %>%
+                            as.matrix())) %>%
+  group_by(extended_country_name) %>%
+  summarise(corr = map(matrix, Hmisc::rcorr) %>%
+              map("r") %>%
+              map(as.numeric),
+            n = map(matrix, Hmisc::rcorr) %>%
+              map("n") %>%
+              map(as.numeric),
+            P = map(matrix, Hmisc::rcorr) %>%
+              map("P") %>%
+              map(as.numeric)) %>%
+  group_by(extended_country_name) %>%
+  unnest()  %>%
+  filter(!is.na(corr), corr > -Inf, n > 20, !is.na(P))
+
+by_country %>%  
+  ggplot(aes(x = corr, weight = n)) +
+  geom_density(fill = "grey", alpha = 0.2) +
+  labs(x = expression(rho), y = "",
+  	title = "Distribution of pairwise correlation coefficients between measures, \nby country",
+  	subtitle = "Red line represents the average correlation coefficient among measures within given countries, 
+weighted by the degree of overlap between measures. Only measures with an overlap of at least 20 years 
+are included.") +
+  geom_vline(xintercept = round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2),
+             color = "red") +
+  scale_x_continuous(breaks = c(-1,-0.5, 0, 0.5, 1, round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2)))
+  
+  
+```
+
+In other words, while on average the pairwise correlation between different measures of democracy within individual country histories is quite high (0.7), for a substantial minority of countries correlations can be much lower, or even negative. These numbers are better if we only look at the degree of agreement among measures from large, well-resourced projects, to be sure, but they are still by no means reassuring if we are looking for consensus:
+
+```{r}
+by_country <- democracy_full %>%
+  group_by(extended_country_name) %>%
+  gather(measure, value, polity2, fh_total_reversed, starts_with("v2x"), pacl) %>%
+  group_by(extended_country_name, measure) %>%
+  filter(!is.na(value), !is.na(GWn), n() > 4) %>%
+  group_by(extended_country_name) %>%
+  arrange(extended_country_name, measure) %>%
+  summarise(matrix = list(tibble(id = paste(extended_country_name, GWn, cown, in_GW_system, year), 
+                                 measure = measure, 
+                                 value = value) %>%
+                            spread(measure, value) %>%
+                            select(-id) %>%
+                            as.matrix())) %>%
+  group_by(extended_country_name) %>%
+  summarise(corr = map(matrix, Hmisc::rcorr) %>%
+              map("r") %>%
+              map(as.numeric),
+            n = map(matrix, Hmisc::rcorr) %>%
+              map("n") %>%
+              map(as.numeric),
+            P = map(matrix, Hmisc::rcorr) %>%
+              map("P") %>%
+              map(as.numeric)) %>%
+  group_by(extended_country_name) %>%
+  unnest()  %>%
+  filter(!is.na(corr), corr > -Inf, n > 20, !is.na(P))
+
+by_country %>%  
+  ggplot(aes(x = corr, weight = n)) +
+  geom_density(fill = "grey", alpha = 0.2) +
+  labs(x = expression(rho), y = "",
+  	title = "Distribution of pairwise correlation coefficients between measures, \nby country",
+  	subtitle = "Red line represents the average pairwise correlation between measures, weighted by their degree of overlap.
+Only Freedom House, Polity, PACL, and V-dem measures are included in this calculation.") +
+  geom_vline(xintercept = round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2),
+             color = "red") +
+  scale_x_continuous(breaks = c(-1,-0.5, 0, 0.5, 1, round(weighted.mean(by_country$corr, by_country$n, na.rm = TRUE), 2)))
+  
+  
+```
+
+Most democracy measurement projects are actually variants of these large-scale efforts; a large number of them take Polity, PACL/ACLP, or Freedom House as starting points to develop their own measures. If we take their correlations as measures of similarity, we can cluster the indexes hierarchically to show these quasi-genealogical family resemblances:
+
+```{r, fig.height=15, fig.width = 9.2}
+
+measures_for_correlation <- which(correlations$n > 4000, arr.ind = TRUE) %>% 
+  rownames() %>% 
+  unique()
+
+correlations <- democracy_full %>%
+  filter(year >= 1900) %>%
+  select(measures_for_correlation) %>%
+  as.matrix() %>%
+  Hmisc::rcorr() 
+
+correlations$r[ is.na(correlations$r) ] <- 0
+
+distance <- as.dist(1-correlations$r)
+
+hierarchical_model <- hclust(distance, method = "ward.D2")
+
+library(ggdendro)
+
+ddata <- dendro_data(as.dendrogram(hierarchical_model), type = "rectangle")
+
+ddata$labels <- ddata$labels %>%
+  mutate(label_long = plyr::mapvalues(label,
+                                      from = c("PIPE_democracy",
+                                               "wgi_democracy",
+                                               "fh_total_reversed",
+                                               "v2x_api",
+                                               "polyarchy_original_contestation",
+                                               "polyarchy_original_polyarchy",
+                                               "fh_electoral",
+                                               "ulfelder_democracy_extended",
+                                               "gwf_democracy_extended",
+                                               "reign_democracy",
+                                               "svolik_democracy",
+                                               "bmr_democracy",
+                                               "magaloni_democracy_extended",
+                                               "pacl",
+                                               "kailitz_binary",
+                                               "pitf_binary",
+                                               "pitf",
+                                               "polity",
+                                               "polity2",
+                                               "PEPS1v",
+                                               "PEPS1i",
+                                               "PEPS1q",
+                                               "vanhanen_competition",
+                                               "polyarchy_contestation_dimension",
+                                               "pmm_hadenius",
+                                               "uds_2014_mean",
+                                               "z1",
+                                               "prc",
+                                               "utip_dichotomous_strict",
+                                               "blm",
+                                               "mainwaring",
+                                               "vanhanen_democratization",
+                                               "v2x_polyarchy",
+                                               "v2x_partipdem",
+                                               "v2x_egaldem",
+                                               "v2x_mpi",
+                                               "v2x_delibdem",
+                                               "v2x_libdem",
+                                               "PEPS2v",
+                                               "PEPS2i",
+                                               "PEPS2q",
+                                               "polyarchy_inclusion_dimension",
+                                               "vanhanen_participation",
+                                               "pmm_munck",
+                                               "lexical_index",
+                                               "pmm_arat",
+                                               "pmm_bollen",
+                                               "bnr_extended",
+                                               "doorenspleet",
+                                               "wth_democ1",
+                                               "wth_democrobust"),
+                                      to = c("PIPE (Przeworski 2013, calculated)",
+                                             "WGI Voice and Accountability Index (2016)",
+                                             "Freedom House (Freedom in the World, 2017)",
+                                             "V-Dem 7.1 Additive Polyarchy Index",
+                                             "Polyarchy contestation scale (Coppedge and Reinicke 1990, revised 2006)",
+                                             "Polyarchy original scale (Coppedge and Reinicke 1990, revised 2006)",
+                                             "Freedom House Electoral Democracy List",
+                                             "Ulfelder 2012",
+                                             "Autocratic Regimes Dataset dichotomous indicator of democracy (Geddes, Wright, and Frantz 2014)",
+                                             "REIGN dataset dichotomous indicator of democracy (Bell 2016)",
+                                             "Svolik 2012",
+                                             "Boix, Miller, and Rosato 2012",
+                                             "Autocracies of the World dataset dichotomous indicator of democracy (Magaloni, Chu, and Min 2013)",
+                                             "PACL/ACLP/CGV/DD dataset (revised version, Cheibub, Gandhi, and Vreeland 2010)",
+                                             "Kailitz 2013 (dichotomous indicator of democracy)",
+                                             "PITF dichotomous indicator of democracy",
+                                             "PITF ordinal indicator of democracy",
+                                             "Polity IV polity score",
+                                             "Polity IV polity 2 score",
+                                             "PEPS1v (Moon et al 2006)",
+                                             "PEPS1i (Moon et al 2006)",
+                                             "PEPS1q (Moon et al 2006)",
+                                             "Vanhanen's Competition index (Vanhanen 2012)",
+                                             "Contestation dimension (Coppedge, Alvarez and Maldonado 2008)",
+                                             "Hadenius 1992",
+                                             "UDS 2014 release (Pemstein, Meserve, and Melton 2010)",
+                                             "Extended UDS (Marquez 2016)",
+                                             "Political Regime Change dataset (Gasiorowski 1996, Reich 2002)",
+                                             "UTIP political regime dataset, strict dichotomous indicator of democracy (Hsu 2008)",
+                                             "Bowman, Lehoucq, and Mahoney 2005",
+                                             "Mainwaring, Brinks and Perez-Linan 2001, 2014",
+                                             "Vanhanen index of democratization (Vanhanen 2014)",
+                                             "V-Dem 7.1 polyarchy index",
+                                             "V-Dem 7.1 participatory democracy index",
+                                             "V-Dem 7.1 egalitarian democracy index",
+                                             "V-Dem 7.1 multiplicative polyarchy democracy index",
+                                             "V-Dem 7.1 deliberative democracy index",
+                                             "V-Dem 7.1 liberal democracy index",
+                                             "PEPS2v (Moon et al 2006)",
+                                             "PEPS2i (Moon et al 2006)",
+                                             "PEPS2q (Moon et al 2006)",
+                                             "Inclusion dimension (Coppedge, Alvarez and Maldonado 2008)",
+                                             "Vanhanen index of participation (Vanhanen 2014)",
+                                             "Munck 2009",
+                                             "LIED (Skaaning, Gerring and Bartusevicius 2015)",
+                                             "Arat 1991",
+                                             "Bollen 2001 indicator of liberal democracy",
+                                             "Bernhard, Nordstrom, and Reenock 2001",
+                                             "Doorenspleet 2000",
+                                             "Dichotomous indicator of democracy from Wahmann, Teorell, and Hadenius 2013",
+                                             "Robust dichotomous indicator of democracy from Wahmann, Teorell, and Hadenius 2013")))
+
+types <- democracy_full %>%
+  select(measures) %>%
+  summarize_all(n_distinct, na.rm = TRUE) %>%
+  gather(label, type) %>%
+  mutate(type = cut(type, breaks = c(0, 2, 3, 25, 12000), 
+                      labels = c("Dichotomous", "Trichotomous", "Ordinal", "Continuous")))
+
+ddata$labels <- left_join(ddata$labels, types)  
+
+ggplot(segment(ddata)) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) + 
+  geom_text(data = ddata$labels,
+            aes(x = x, y = y, label = label_long,
+                color = type), size = 2)  +
+  coord_flip() + 
+  scale_y_reverse(expand = c(0.2, 0)) +
+  theme_dendro() +
+  labs(title = "Hierarchical clustering of measures of democracy",
+       subtitle = "Based on correlations between measures with more than 4,000 country-years of overlap.",
+       color = "Type of measure") +
+  theme(panel.border = element_rect(color = NA, fill = NA)) 
+
+```
+
+At the top, we have the "Polity cluster" -- measures of democracy that mostly just modify Polity, including the Participation-Enhanced Polity Scores (PEPS), the PITF indicators (based on subcomponents of Polity), and the Polity scores themselves. These are highly related to some calculated indexes, including the Unified Democracy Scores and my extension, Freedom House, and Coppedge, Alvarez, and Maldonado's "contestation dimension" (from a principal components analysis of a number of democracy measures), that attempt to weigh multiple factors in the construction of a measure of democracy, but mostly end up giving weight to the contestability of power and civil liberties. 
+
+In the middle we have a cluster that attempts to weigh participation and contestation more equally (LIED, the V-Dem Additive Polyarchy Index, Vanhanen's Index of Democratization, etc.) and then a cluster of measures that derive from PACL's attempts to develop a dichotomous measure of democracy (including Boix, Miller and Rosato's extension as well as Geddes, Wright, and Frantz's dataset of Autocratic regimes, as well as several other academic datasets). Then there is another cluster of measures that give more weight to formal inclusion (e.g. Doorenspleet, and Bernhard, Nordstrom, and Reenock, both of which make democracy depend on the existence of universal suffrage), a cluster of V-Dem indexes (which weigh multiple factors to come up with a number, including formal inclusiveness), and finally at the bottom we find measures that simply gauge the degree of participation (Vanhanen's index of participation and the "inclusion dimension" calculated by Coppedge, Alvarez, and Maldonado).
+
+There is a lot more that one could show here, but this is probably enough for now; hope these tools are useful to others! All code for this post available [in this repository](https://github.com/xmarquez/measuringDemocracyBlog).
+
